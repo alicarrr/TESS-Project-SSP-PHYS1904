@@ -5,22 +5,33 @@ from astropy.units import Quantity
 import pandas as pd
 from astropy.stats import mad_std
 
+# File to iterate over a range of TOI inputs and perform transit analysis on these. 
+# This was adapted from the Jupyter notebook provided. 
 
+# NOTE: make sure the CSV file "exoplanetdata_alldata_nocleaning.csv" is empty before running, this code takes a long time to 
+# run and will overwrite an existing file with the name provided if the data for it already exists
+
+# Pull database from NASA of project candidates and their properties
 nasa = pd.read_csv("nasa_toi_alldata.csv")
 
-#check 
-
-#[587,1054,1073,1078,1098,118,120,1203,122,123,1230,1235,1239]
-#[294090620,366989877,158297421,370133522,383390264,266980320,394137592,23434737,231702397,290131778,287156968,103633434,154716798]
+# Extract TOI and TIC ID from database
 toi_list = nasa["toi"]
 tic_list = nasa["tid"]
-data={}
 
-f = open("exoplanetdata_all_new_version2.csv", "w")
-f.truncate()
-f.close()
+# Make empty dataframe
+data={}
+ 
+# Uncomment these three lines before running the code (if uncommented data in csv will be overwritten when run)
+
+# f = open("exoplanetdata_alldata_nocleaning.csv", "w")      # Open new file to import exoplanet data into after individual analysis
+# f.truncate()                                               # Erase existing data
+# f.close()                                                  # Close file
 
 def csvoutput():
+    """
+        Function to produce light curves and transit model for each inputted TOI and TIC pair 
+        and writes these results to an output CSV file which can then have analysis performed on it.
+    """
     rowcount = 0
 
     for i in range(len(tic_list)):
@@ -99,7 +110,7 @@ def csvoutput():
                 row20 = [toi,"20sec", type, mag , data[tic,toi]["20sec"]["Period"].value, data[tic,toi]["20sec"]["Time"].value,data[tic,toi]["20sec"]["Duration"].value, data[tic,toi]["20sec"]["Depth"].value, ratio]
                 row120 = [tic,"120sec"," ", "" , data[tic,toi]["120sec"]["Period"].value, data[tic,toi]["120sec"]["Time"].value,data[tic,toi]["120sec"]["Duration"].value, data[tic,toi]["120sec"]["Depth"].value, ""]
 
-                with open("exoplanetdata_all_new_version2.csv", "a", newline = '') as f:
+                with open("exoplanetdata_alldata_nocleaning.csv", "a", newline = '') as f:
                     writer = csv.writer(f)
                     if rowcount == 0:
                         writer.writerow(x)
@@ -111,30 +122,5 @@ def csvoutput():
                         writer.writerow(row120)
             else:
                 continue
-               
-
-
-
-
-dataset = pd.read_csv("exoplanetdata_all.csv")
-dataset_20sec = dataset.iloc[::2]
-
-def analysis():
-    median = dataset_20sec['Ratio'].median()
-    mean = dataset_20sec['Ratio'].mean()
-    stdev = dataset_20sec['Ratio'].std()
-    count = dataset_20sec['Ratio'].count()
-    countsqrt = np.sqrt(count)
-    sem = stdev/countsqrt
-    print(str(median) + " +/- " + str(sem))
-    print(mean,stdev)
-    print(mad_std(dataset_20sec['Ratio']))
 
 csvoutput()
-analysis()
-
-
-
-
-    
-
