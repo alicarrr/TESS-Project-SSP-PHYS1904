@@ -5,7 +5,8 @@ from astropy.units import Quantity
 import pandas as pd
 from astropy.stats import mad_std
 
-# File with functions to perform all error analysis for a given data set.
+# File with functions to perform all error analysis for a given data set. 
+# It also filters the dataframe to separate for depths above and below 0.005
 
 
 def cleaning(dataframe):
