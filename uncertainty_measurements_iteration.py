@@ -7,10 +7,6 @@ from astropy.stats import mad_std
 
 data_i = pd.read_csv("exoplanet_cleaned_with120.csv")
 
-#check 
-
-#[587,1054,1073,1078,1098,118,120,1203,122,123,1230,1235,1239]
-#[294090620,366989877,158297421,370133522,383390264,266980320,394137592,23434737,231702397,290131778,287156968,103633434,154716798]
 toi_list = data_i['System'].iloc[::2]
 tic_list = data_i["System"].iloc[1::2]
 magnitude_list = data_i['Magnitude'].iloc[::2]
@@ -18,12 +14,12 @@ ratio_list = data_i['Ratio'].iloc[::2]
 period20_list = data_i['Period'].iloc[::2]
 period120_list = data_i['Period'].iloc[1::2]
 
-toi_list.reset_index(drop=True, inplace=True)
-tic_list.reset_index(drop=True, inplace=True)
-magnitude_list.reset_index(drop=True, inplace=True)
-ratio_list.reset_index(drop=True, inplace=True)
-period20_list.reset_index(drop=True, inplace=True)
-period120_list.reset_index(drop=True, inplace=True)
+toi_list.reset_index(drop = True, inplace = True)
+tic_list.reset_index(drop = True, inplace = True)
+magnitude_list.reset_index(drop = True, inplace = True)
+ratio_list.reset_index(drop = True, inplace = True)
+period20_list.reset_index(drop = True, inplace = True)
+period120_list.reset_index(drop = True, inplace = True)
 
 f = open("", "w")
 f.truncate()
@@ -40,20 +36,20 @@ def csvoutput():
         period20 = period20_list[i]
         period120 = period120_list[i]
 
-        search_result1 = lk.search_lightcurve('TIC'+str(tic), mission='TESS', exptime=20)
-        search_result2 = lk.search_lightcurve('TIC'+str(tic), mission='TESS', exptime=120)
+        search_result1 = lk.search_lightcurve('TIC' + str(tic), mission = 'TESS', exptime = 20)
+        search_result2 = lk.search_lightcurve('TIC' + str(tic), mission = 'TESS', exptime = 120)
         
         lc_collection1 = search_result1[0].download()
         lc_collection2 = search_result2[0].download()
             
-        lc1 = lc_collection1.normalize().remove_outliers(sigma_upper=3, sigma_lower=float('inf'))
-        lc2 = lc_collection2.normalize().remove_outliers(sigma_upper=3, sigma_lower=float('inf'))
+        lc1 = lc_collection1.normalize().remove_outliers(sigma_upper = 3, sigma_lower = float('inf'))
+        lc2 = lc_collection2.normalize().remove_outliers(sigma_upper = 3, sigma_lower = float('inf'))
 
-        period1 = np.linspace(period20-1.5, period20+1.5, 5000)
-        period2 = np.linspace(period120-1.5, period120+1.5, 5000)
+        period1 = np.linspace(period20 - 1.5, period20 + 1.5, 5000)
+        period2 = np.linspace(period120 - 1.5, period120 + 1.5, 5000)
         try:
-            bls1 = lc1.to_periodogram(method='bls', period=period1, frequency_factor=500)
-            bls2 = lc2.to_periodogram(method='bls', period=period2, frequency_factor=500)
+            bls1 = lc1.to_periodogram(method = 'bls', period = period1, frequency_factor = 500)
+            bls2 = lc2.to_periodogram(method = 'bls', period = period2, frequency_factor = 500)
 
             planet_b_period1 = bls1.period_at_max_power
             planet_b_t01 = bls1.transit_time_at_max_power
@@ -65,12 +61,12 @@ def csvoutput():
             planet_b_dur2 = bls2.duration_at_max_power
             planet_b_depth2 = bls2.depth_at_max_power
 
-            planet_b_mask1 = bls1.get_transit_mask(period=planet_b_period1,
-                                    transit_time=planet_b_t01,
-                                    duration=planet_b_dur1)
-            planet_b_mask2 = bls2.get_transit_mask(period=planet_b_period2,
-                                                transit_time=planet_b_t02,
-                                                duration=(planet_b_dur2+planet_b_dur2*0.12))
+            planet_b_mask1 = bls1.get_transit_mask(period = planet_b_period1,
+                                    transit_time = planet_b_t01,
+                                    duration = planet_b_dur1)
+            planet_b_mask2 = bls2.get_transit_mask(period = planet_b_period2,
+                                                transit_time = planet_b_t02,
+                                                duration = (planet_b_dur2 + planet_b_dur2 * 0.12))
 
             x = lc1.to_pandas()
             y = lc2.to_pandas()
@@ -88,27 +84,27 @@ def csvoutput():
 
 
             # lc_binned1=lc1.bin(time_bin_size=0.00139)
-            lc_binned1=lc1.bin(binsize=6)
+            lc_binned1=lc1.bin(binsize = 6)
             binnedx = lc_binned1.to_pandas()
             binnedx_std = binnedx['flux'].std()
 
-            bls3 = lc_binned1.to_periodogram(method='bls', period=period1, frequency_factor=500);
+            bls3 = lc_binned1.to_periodogram(method = 'bls', period = period1, frequency_factor = 500);
             planet_binned_period1 = bls3.period_at_max_power
             planet_binned_t01 = bls3.transit_time_at_max_power
             planet_binned_dur1 = bls3.duration_at_max_power
             planet_binned_depth1 = bls3.depth_at_max_power
 
 
-            planet_b_mask_binned = bls3.get_transit_mask(period=planet_binned_period1,
-                                                transit_time=planet_binned_t01,
-                                                duration=planet_binned_dur1)
+            planet_b_mask_binned = bls3.get_transit_mask(period = planet_binned_period1,
+                                                transit_time = planet_binned_t01,
+                                                duration = planet_binned_dur1)
 
             masked_binned_lc1 = lc_binned1[~planet_b_mask_binned]
             masked_binned = masked_binned_lc1.to_pandas()
             masked_binned_std = masked_binned['flux'].std()
 
-            row = [toi,tic,mag,planet_b_period1,planet_b_period2,planet_b_depth1,planet_b_depth2,x_std,y_std,masked_binned_std,maskedy_std]
-            header = ['TOI','TIC','Magnitude','20 Period', '120 Period', '20 Depth', '120 Depth','20 Std', '120 Std', '20 M/B Std','120 M Std']
+            row = [toi, tic, mag, planet_b_period1, planet_b_period2, planet_b_depth1, planet_b_depth2, x_std, y_std, masked_binned_std, maskedy_std]
+            header = ['TOI', 'TIC', 'Magnitude', '20 Period', '120 Period', '20 Depth', '120 Depth', '20 Std', '120 Std', '20 M/B Std', '120 M Std']
             with open("", "a", newline = '') as f:
                 writer = csv.writer(f)
                 if rowcount == 0:
@@ -121,8 +117,6 @@ def csvoutput():
             
         except ValueError:
             continue
-
-        
-                
+       
 csvoutput()
 
