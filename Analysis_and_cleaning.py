@@ -5,10 +5,11 @@ from astropy.units import Quantity
 import pandas as pd
 from astropy.stats import mad_std
 
+"""
+    File with functions to perform all error analysis for a given data set.
 
-dataset = pd.read_csv("exoplanetdata_alldata_nocleaning.csv", index_col = False)
-dataset_20sec = dataset.iloc[::2]
-stdev = dataset_20sec['Ratio'].std()
+"""
+
 
 def cleaning(dataframe):
     stdev = dataframe['Ratio'].std()
@@ -36,22 +37,6 @@ def analysis(dataframe, column):
 
     return median, mean, stdev, count, sem
 
-#def analysis_120(depth_120):
-    depth_120_pandas = pd.DataFrame(depth_120)
-    
-    median = depth_120_pandas.median()
-    mean = depth_120_pandas.mean()
-    stdev = depth_120_pandas.std()
-    count = depth_120_pandas.count()
-    countsqrt = np.sqrt(count)
-    sem = stdev / countsqrt
-    print('Median +/- SEM:',str(median), "+/-", str(sem))
-    print('Mean +/- StDev:', mean, '+/-' , stdev)
-    print('MadStd:', mad_std(depth_120_pandas))
-
-    return median, mean, stdev, count, sem
-
-
 
 def outliers(dataframe):
     new = cleaning(dataframe)
@@ -61,10 +46,6 @@ def outliers(dataframe):
         i += 1
     return(new)
 
-
-new = outliers(dataset)
-
-new.to_csv('exoplanet_cleaned_with120.csv', index = False)
 
 def separation(dataframe):
     indexlist_big = []
@@ -82,9 +63,15 @@ def separation(dataframe):
     new_sml = dataframe.copy().drop(indexlist_big)
     return(new_big,new_sml)
     
+
+dataset = pd.read_csv("exoplanetdata_alldata_nocleaning.csv", index_col = False)
+dataset_20sec = dataset.iloc[::2]
+stdev = dataset_20sec['Ratio'].std()
+
+new = outliers(dataset)
+new.to_csv('exoplanet_cleaned_with120.csv', index = False)
         
 new_big, new_sml = separation(dataset)
-
 new_big = outliers(new_big)
 new_sml = outliers(new_sml)
 
@@ -95,5 +82,3 @@ new_sml.to_csv('exoplanet_cleaned_sml_with120.csv', index = False)
 analysis(new,'Ratio')
 analysis(new_sml,'Ratio')
 analysis(new_big,'Ratio')
-
-

@@ -5,7 +5,6 @@ from astropy.units import Quantity
 import pandas as pd
 from astropy.stats import mad_std
 
-
 data_i = pd.read_csv("exoplanet_cleaned_with120.csv")
 
 #check 
@@ -41,10 +40,6 @@ def csvoutput():
         period20 = period20_list[i]
         period120 = period120_list[i]
 
-        
-
-
-        
         search_result1 = lk.search_lightcurve('TIC'+str(tic), mission='TESS', exptime=20)
         search_result2 = lk.search_lightcurve('TIC'+str(tic), mission='TESS', exptime=120)
         
@@ -96,7 +91,6 @@ def csvoutput():
             lc_binned1=lc1.bin(binsize=6)
             binnedx = lc_binned1.to_pandas()
             binnedx_std = binnedx['flux'].std()
-
 
             bls3 = lc_binned1.to_periodogram(method='bls', period=period1, frequency_factor=500);
             planet_binned_period1 = bls3.period_at_max_power
