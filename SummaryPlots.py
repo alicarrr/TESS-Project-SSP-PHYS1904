@@ -6,15 +6,7 @@ import pandas as pd
 from sklearn.linear_model import LinearRegression
 import Analysis_and_cleaning as ana
 
-
-"""
-    Function to plot summary graphs and perform regression for analysis of multiple systems
-
-    Sample output for one graph regression:
-    R^2 = 0.07078999294886457
-    Intercept = 0.050703077190033904
-    Slope = [-1.25046581]
-"""
+# File to plot summary graphs and perform regression for analysis of multiple systems
 
 
 def regression(x, y):
@@ -50,12 +42,12 @@ def regression(x, y):
     return regression, r_squared, intercept, slope
 
 
-
 # Read csvs to perform plotting
 data_relative_error = pd.read_csv("exoplanet_UPD_relative_error.csv")               # CSV containing relative error calculations
 data_uncertainty = pd.read_csv("exoplanet_std_uncertainties_outliersremoved.csv")   # CSV including data without outliers
-data_cleaned_before = pd.read_csv("exoplanet_cleaned.csv")                                 # Cleaned data before fitering
-data_after = pd.read_csv("exoplanet_cleaned_big.csv") # Cleaned data after filtering
+data_cleaned_before = pd.read_csv("exoplanet_cleaned_with120.csv")                  # Cleaned data before fitering
+data_after = pd.read_csv("exoplanet_cleaned_big_with120.csv")                       # Cleaned data after filtering
+
 # Extract parameters from each database
 
 # Relative error database
@@ -75,18 +67,22 @@ std_mag = data_uncertainty['Magnitude'].to_numpy().T
 std_ratio = std_120 / std_20
 
 # Extract data from cleaned csv file before filtering
-depth_20_cleaned_before = data_cleaned_before['Depth'].to_numpy().T
-ratio_cleaned_before = data_cleaned_before['Ratio'].to_numpy().T
-magnitude_cleaned_before = data_cleaned_before['Magnitude'].to_numpy().T
-depth_120_cleaned_before = ratio_cleaned_before * depth_20_cleaned_before
-data_cleaned_before['Depth_120'] = depth_120_cleaned_before
+data_20_cleaned_before = data_cleaned_before[data_cleaned_before["Format"] == "20sec"]
+data_120_cleaned_before = data_cleaned_before[data_cleaned_before["Format"] == "120sec"]
+
+depth_20_cleaned_before = data_20_cleaned_before['Depth'].to_numpy().T
+ratio_cleaned_before = data_20_cleaned_before['Ratio'].to_numpy().T
+magnitude_cleaned_before = data_20_cleaned_before['Magnitude'].to_numpy().T
+depth_120_cleaned_before = data_120_cleaned_before['Depth'].to_numpy().T
 
 # Extract data from cleaned csv file after filtering
-depth_20_after = data_after['Depth'].to_numpy().T
-ratio_after = data_after['Ratio'].to_numpy().T
-magnitude_after = data_after['Magnitude'].to_numpy().T
-depth_120_after = ratio_after * depth_20_after
-data_after['Depth_120'] = depth_120_after
+data_20_cleaned_after = data_cleaned_before[data_cleaned_before["Format"] == "20sec"]
+data_120_cleaned_after = data_cleaned_before[data_cleaned_before["Format"] == "120sec"]
+
+depth_20_after = data_20_cleaned_after['Depth'].to_numpy().T
+ratio_after = data_20_cleaned_after['Ratio'].to_numpy().T
+magnitude_after = data_20_cleaned_after['Magnitude'].to_numpy().T
+depth_120_after = data_120_cleaned_after['Depth'].to_numpy().T
 
 # Reshape data for use in regression 
 
@@ -122,18 +118,18 @@ regression_mag_v_ratio_after, r_squared_11, intercept_11, slope_11 = regression(
 
 # Before Separation
 print('Printing results for data before separation to reduce errors')
-median_ratio_before, mean_ratio_before, stdev_ratio_before, count_ratio_before, SEM_ratio_before = ana.analysis(data_cleaned_before, 'Ratio')
-median_depth_20_before, mean_depth_20_before, stdev_depth_20_before, count_depth_20_before, SEM_depth_20_before = ana.analysis(data_cleaned_before, 'Depth')
-median_depth_120_before, mean_depth_120_before, stdev_depth_120_before, count_depth_120_before, SEM_depth_120_before = ana.analysis(data_cleaned_before, 'Depth_120')
-median_mag_before, mean_mag_before, stdev_mag_before, count_mag_before, SEM_mag_before = ana.analysis(data_cleaned_before, 'Magnitude')
+median_ratio_before, mean_ratio_before, stdev_ratio_before, count_ratio_before, SEM_ratio_before = ana.analysis(data_20_cleaned_before, 'Ratio')
+median_depth_20_before, mean_depth_20_before, stdev_depth_20_before, count_depth_20_before, SEM_depth_20_before = ana.analysis(data_20_cleaned_before, 'Depth')
+median_depth_120_before, mean_depth_120_before, stdev_depth_120_before, count_depth_120_before, SEM_depth_120_before = ana.analysis(data_120_cleaned_before, 'Depth')
+median_mag_before, mean_mag_before, stdev_mag_before, count_mag_before, SEM_mag_before = ana.analysis(data_20_cleaned_before, 'Magnitude')
 print('-------------------------------------------------------------')
 
 # After separation
 print('Printing results for data after separation to reduce errors')
-median_ratio_after, mean_ratio_after, stdev_ratio_after, count_ratio_after, SEM_ratio_after = ana.analysis(data_after, 'Ratio')
-median_depth_20_after, mean_depth_20_after, stdev_depth_20_after, count_depth_20_after, SEM_depth_20_after = ana.analysis(data_after, 'Depth')
-median_depth_120_after, mean_depth_120_after, stdev_depth_120_after, count_depth_120_after, SEM_depth_120_after = ana.analysis(data_after, 'Depth_120')
-median_mag_after, mean_mag_after, stdev_mag_after, count_mag_after, SEM_mag_after = ana.analysis(data_after, 'Magnitude')
+median_ratio_after, mean_ratio_after, stdev_ratio_after, count_ratio_after, SEM_ratio_after = ana.analysis(data_20_cleaned_after, 'Ratio')
+median_depth_20_after, mean_depth_20_after, stdev_depth_20_after, count_depth_20_after, SEM_depth_20_after = ana.analysis(data_20_cleaned_after, 'Depth')
+median_depth_120_after, mean_depth_120_after, stdev_depth_120_after, count_depth_120_after, SEM_depth_120_after = ana.analysis(data_120_cleaned_after, 'Depth')
+median_mag_after, mean_mag_after, stdev_mag_after, count_mag_after, SEM_mag_after = ana.analysis(data_20_cleaned_after, 'Magnitude')
 print('-------------------------------------------------------------')
 
 # Relative error plots 
