@@ -105,7 +105,7 @@ def csvoutput():
 
             row = [toi, tic, mag, planet_b_period1, planet_b_period2, planet_b_depth1, planet_b_depth2, x_std, y_std, masked_binned_std, maskedy_std]
             header = ['TOI', 'TIC', 'Magnitude', '20 Period', '120 Period', '20 Depth', '120 Depth', '20 Std', '120 Std', '20 M/B Std', '120 M Std']
-            with open("", "a", newline = '') as f:
+            with open("exoplanet_std_uncertainties_outliersremoved", "a", newline = '') as f:
                 writer = csv.writer(f)
                 if rowcount == 0:
                     writer.writerow(header)

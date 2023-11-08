@@ -107,7 +107,7 @@ dataset = pd.read_csv("exoplanetdata_alldata_nocleaning.csv", index_col = False)
 dataset_20sec = dataset.iloc[::2]
 stdev = dataset_20sec['Ratio'].std()
 
-# Remove outliers from original data
+# Remove outliers from original data and convert to a csv
 new = outliers(dataset)
 new.to_csv('exoplanet_cleaned_with120.csv', index = False)
 
